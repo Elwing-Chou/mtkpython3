@@ -27,3 +27,28 @@ class Student(Base):
 
     def __repr__(self):
         return self.__str__()
+
+if __name__ == "__main__":
+    import os
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    fn = os.path.join(os.path.dirname(__file__), "data.sqlite")
+    fn = "sqlite:///" + fn
+    engine = create_engine(fn, echo=False)
+    Session = sessionmaker(bind=engine)
+    sess = Session()
+    # 創建完整資料庫 create_all/drop_all
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    # 測試資料
+    phones = [Mobile(number="0912345678"),
+              Mobile(number="0922222222"),
+              Mobile(number="0911111111")]
+    s = Student(name="Elwing", phones=phones)
+    sess.add(s)
+    sess.commit()
+    students = sess.query(Student).filter_by(name="Elwing")
+    # .all()  .first()
+    s = students.first()
+    print(s)
+    print(s.phones)
